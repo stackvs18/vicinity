@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <span class="eyebrow fade-in">15-minute neighbourhood score</span>
+  <h1 class="fade-in delay-1">How livable is<br>your address?</h1>
+  <p class="hero-sub fade-in delay-2">
+    Type any address. Vicinity finds every grocery, hospital, bus stop, park and pharmacy
+    within a 15-minute walk and scores it out of 100.
+  </p>
+
+  <div class="search-box fade-in delay-3">
+    <form class="search" action="{% url 'search' %}" method="get" data-loading>
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" name="q" placeholder="Search any area, e.g. Navrangpura Ahmedabad" autocomplete="off" required autofocus
+             data-suggest="go" data-suggest-url="{% url 'api_suggest' %}" data-locate-url="{% url 'locate' %}">
+      <button type="submit">Score it</button>
+    </form>
+    <ul class="suggestions" hidden></ul>
+  </div>
+
+  <div class="hero-actions fade-in delay-4">
+    <button type="button" class="link-button" id="use-location" data-url="{% url 'locate' %}">
+      📍 Use my location
+    </button>
+  </div>
+
+  <div class="chips fade-in delay-4">
+    {% for example in examples %}
+      <a class="chip" href="{% url 'search' %}?q={{ example|urlencode }}" data-loading>{{ example }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if area_count %}
+<section class="two-columns">
+  <div class="card">
+    <h2 class="card-title">Top scored</h2>
+    <ul class="area-list">
+      {% for area in top_areas %}
+        <li>
+          <a href="{{ area.get_absolute_url }}">
+            <span class="area-list-name">{{ area.name }}</span>
+            <span class="pill pill-{{ area.grade|slugify }}">{{ area.grade }}</span>
+            <span class="area-list-score">{{ area.score }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Recently checked</h2>
+    <ul class="area-list">
+      {% for area in recent_areas %}
+        <li>
+          <a href="{{ area.get_absolute_url }}">
+            <span class="area-list-name">{{ area.name }}</span>
+            <span class="muted small">{{ area.created_at|timesince }} ago</span>
+            <span class="area-list-score">{{ area.score }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<section class="steps">
+  <div class="step">
+    <span class="step-number">01</span>
+    <h3>Find</h3>
+    <p>Your address becomes coordinates (Nominatim), then every useful place within 1.2 km comes from OpenStreetMap (Overpass).</p>
+  </div>
+  <div class="step">
+    <span class="step-number">02</span>
+    <h3>Walk</h3>
+    <p>Real walking times along streets to the nearest of each kind, from the OSRM router. Not straight lines.</p>
+  </div>
+  <div class="step">
+    <span class="step-number">03</span>
+    <h3>Score</h3>
+    <p>10 categories, weighted to 100 points. Closer and more choice scores higher. Every area is cached in PostgreSQL.</p>
+  </div>
+</section>
+{% endblock %}
