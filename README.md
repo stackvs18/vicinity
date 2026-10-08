@@ -4,19 +4,21 @@
 
 Built with **Django 6.1, Django REST Framework and PostgreSQL**, entirely on free OpenStreetMap services. No API keys.
 
+**Live demo:** https://vicinity.onrender.com (free plan: the first visit may take a minute to wake up)
+
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/stackvs18/vicinity)
 
 ![Home](docs/home_full.png)
 
-| Area page | Compare |
-|---|---|
+| Area page                   | Compare                      |
+| --------------------------- | ---------------------------- |
 | ![Area page](docs/area.png) | ![Compare](docs/compare.png) |
 
 ---
 
 ## Why
 
-Anyone choosing a PG, a flat or a hostel asks the same thing: *"Is there a grocery, a hospital, a bus stop near here?"* Today you find out by zooming around a map one category at a time, guessing walking distances from straight lines.
+Anyone choosing a PG, a flat or a hostel asks the same thing: _"Is there a grocery, a hospital, a bus stop near here?"_ Today you find out by zooming around a map one category at a time, guessing walking distances from straight lines.
 
 Vicinity answers it in one search, with one number you can compare: **82/100 for Navrangpura, 94 for Koramangala**.
 
@@ -24,36 +26,36 @@ Vicinity answers it in one search, with one number you can compare: **82/100 for
 
 ## Features
 
-| Feature | What you get |
-|---|---|
-| **Score out of 100** | A score ring, a grade (Excellent / Very good / Good / Fair / Limited) and a one-line verdict: *"Great for groceries and transport. Nothing within a 15-minute walk for pharmacies."* |
-| **10 categories** | Groceries, hospitals and clinics, bus and metro, pharmacies, schools and colleges, parks, food and cafés, ATMs and banks, police and fire, gyms and sports. Each shows its nearest place, the walking time and how many are nearby. |
-| **Real walking times** | Routed along real streets (OSRM), not straight lines |
-| **Interactive map** | Every place as a coloured dot inside the dashed 15-minute circle; click a category to hide or show it |
-| **Typo-tolerant search** | Suggestions while typing: "koramangla", "navrangpra ahmdabad" and "conaught place" all work |
-| **Use my location** | Your browser's location is scored directly |
-| **Compare** | Two areas side by side, category by category, with the winner highlighted |
-| **Accounts** | Sign up, log in, save areas |
-| **Leaderboard** | The best-scored areas on the home page, plus live stats (areas scored, places mapped) |
-| **REST API** | `/api/score/`, `/api/suggest/`, `/api/areas/`, `/api/areas/<id>/`, rate limited |
-| **Admin** | Django admin for areas, places, scores, saved areas and the geocode cache |
+| Feature                  | What you get                                                                                                                                                                                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Score out of 100**     | A score ring, a grade (Excellent / Very good / Good / Fair / Limited) and a one-line verdict: _"Great for groceries and transport. Nothing within a 15-minute walk for pharmacies."_                                                |
+| **10 categories**        | Groceries, hospitals and clinics, bus and metro, pharmacies, schools and colleges, parks, food and cafés, ATMs and banks, police and fire, gyms and sports. Each shows its nearest place, the walking time and how many are nearby. |
+| **Real walking times**   | Routed along real streets (OSRM), not straight lines                                                                                                                                                                                |
+| **Interactive map**      | Every place as a coloured dot inside the dashed 15-minute circle; click a category to hide or show it                                                                                                                               |
+| **Typo-tolerant search** | Suggestions while typing: "koramangla", "navrangpra ahmdabad" and "conaught place" all work                                                                                                                                         |
+| **Use my location**      | Your browser's location is scored directly                                                                                                                                                                                          |
+| **Compare**              | Two areas side by side, category by category, with the winner highlighted                                                                                                                                                           |
+| **Accounts**             | Sign up, log in, save areas                                                                                                                                                                                                         |
+| **Leaderboard**          | The best-scored areas on the home page, plus live stats (areas scored, places mapped)                                                                                                                                               |
+| **REST API**             | `/api/score/`, `/api/suggest/`, `/api/areas/`, `/api/areas/<id>/`, rate limited                                                                                                                                                     |
+| **Admin**                | Django admin for areas, places, scores, saved areas and the geocode cache                                                                                                                                                           |
 
 ---
 
 ## Real results
 
-| Area | Score | Places within 15 min |
-|---|---|---|
-| Indiranagar, Bengaluru | **99** | 1,021 |
-| Bandra West, Mumbai | **98** | 560 |
-| Koramangala, Bengaluru | **94** | 693 |
-| Connaught Place, New Delhi | **94** | 580 |
-| Karve Nagar, Pune | **88** | 185 |
-| Thiyagaraya Nagar, Chennai | **87** | 239 |
-| Navrangpura, Ahmedabad | **82** | 110 |
-| Gachibowli, Hyderabad | **82** | 162 |
-| Satellite, Ahmedabad | **80** | 81 |
-| Dharmatala (Park Street), Kolkata | **63** | 255 |
+| Area                              | Score  | Places within 15 min |
+| --------------------------------- | ------ | -------------------- |
+| Indiranagar, Bengaluru            | **99** | 1,021                |
+| Bandra West, Mumbai               | **98** | 560                  |
+| Koramangala, Bengaluru            | **94** | 693                  |
+| Connaught Place, New Delhi        | **94** | 580                  |
+| Karve Nagar, Pune                 | **88** | 185                  |
+| Thiyagaraya Nagar, Chennai        | **87** | 239                  |
+| Navrangpura, Ahmedabad            | **82** | 110                  |
+| Gachibowli, Hyderabad             | **82** | 162                  |
+| Satellite, Ahmedabad              | **80** | 81                   |
+| Dharmatala (Park Street), Kolkata | **63** | 255                  |
 
 A new area takes 5–30 s (the free map servers are slow); a cached area takes 0.001 s; suggestions for scored areas take 0.002 s.
 
@@ -104,45 +106,45 @@ sequenceDiagram
 
 Each category is worth a **weight**; the weights add up to 100.
 
-| Category | Weight | | Category | Weight |
-|---|---|---|---|---|
-| 🛒 Groceries | 15 | | 🌳 Parks | 10 |
-| 🏥 Hospitals & clinics | 15 | | ☕ Food & cafés | 10 |
-| 🚌 Bus & metro | 15 | | 🏧 ATMs & banks | 5 |
-| 💊 Pharmacies | 10 | | 🚓 Police & fire | 5 |
-| 🎓 Schools & colleges | 10 | | 🏋️ Gyms & sports | 5 |
+| Category               | Weight |     | Category         | Weight |
+| ---------------------- | ------ | --- | ---------------- | ------ |
+| 🛒 Groceries           | 15     |     | 🌳 Parks         | 10     |
+| 🏥 Hospitals & clinics | 15     |     | ☕ Food & cafés  | 10     |
+| 🚌 Bus & metro         | 15     |     | 🏧 ATMs & banks  | 5      |
+| 💊 Pharmacies          | 10     |     | 🚓 Police & fire | 5      |
+| 🎓 Schools & colleges  | 10     |     | 🏋️ Gyms & sports | 5      |
 
 ```
 category points = weight × closeness × variety
 score           = sum of all category points (rounded)
 ```
 
-| Walk to the nearest | closeness | | How many within 15 min | variety |
-|---|---|---|---|---|
-| ≤ 5 min | 1.00 | | 0 | 0.00 |
-| ≤ 10 min | 0.85 | | 1 | 0.70 |
-| ≤ 15 min | 0.65 | | 2–3 | 0.85 |
-| ≤ 20 min | 0.45 | | 4 or more | 1.00 |
-| more | 0.25 | | | |
+| Walk to the nearest | closeness |     | How many within 15 min | variety |
+| ------------------- | --------- | --- | ---------------------- | ------- |
+| ≤ 5 min             | 1.00      |     | 0                      | 0.00    |
+| ≤ 10 min            | 0.85      |     | 1                      | 0.70    |
+| ≤ 15 min            | 0.65      |     | 2–3                    | 0.85    |
+| ≤ 20 min            | 0.45      |     | 4 or more              | 1.00    |
+| more                | 0.25      |     |                        |         |
 
 **Grades:** 80+ Excellent · 65+ Very good · 50+ Good · 35+ Fair · below that, Limited.
 
 <details>
 <summary><b>Worked example: Navrangpura, Ahmedabad (82)</b></summary>
 
-| Category | Nearest walk | Count | Calculation | Points |
-|---|---|---|---|---|
-| Groceries | 9.1 min | 8 | 15 × 0.85 × 1.0 | 12.8 |
-| Hospitals | 3.7 min | 47 | 15 × 1.0 × 1.0 | 15.0 |
-| Bus & metro | 1.3 min | 5 | 15 × 1.0 × 1.0 | 15.0 |
-| Schools | 6.0 min | 9 | 10 × 0.85 × 1.0 | 8.5 |
-| Food | 3.0 min | 25 | 10 × 1.0 × 1.0 | 10.0 |
-| Parks | 8.6 min | 4 | 10 × 0.85 × 1.0 | 8.5 |
-| Pharmacies | — | 0 | 10 × 0 × 0 | 0.0 |
-| ATMs & banks | 8.9 min | 6 | 5 × 0.85 × 1.0 | 4.2 |
-| Gyms & sports | 7.7 min | 5 | 5 × 0.85 × 1.0 | 4.2 |
-| Police & fire | 4.7 min | 1 | 5 × 1.0 × 0.7 | 3.5 |
-| **Total** | | | | **81.7 → 82** |
+| Category      | Nearest walk | Count | Calculation     | Points        |
+| ------------- | ------------ | ----- | --------------- | ------------- |
+| Groceries     | 9.1 min      | 8     | 15 × 0.85 × 1.0 | 12.8          |
+| Hospitals     | 3.7 min      | 47    | 15 × 1.0 × 1.0  | 15.0          |
+| Bus & metro   | 1.3 min      | 5     | 15 × 1.0 × 1.0  | 15.0          |
+| Schools       | 6.0 min      | 9     | 10 × 0.85 × 1.0 | 8.5           |
+| Food          | 3.0 min      | 25    | 10 × 1.0 × 1.0  | 10.0          |
+| Parks         | 8.6 min      | 4     | 10 × 0.85 × 1.0 | 8.5           |
+| Pharmacies    | —            | 0     | 10 × 0 × 0      | 0.0           |
+| ATMs & banks  | 8.9 min      | 6     | 5 × 0.85 × 1.0  | 4.2           |
+| Gyms & sports | 7.7 min      | 5     | 5 × 0.85 × 1.0  | 4.2           |
+| Police & fire | 4.7 min      | 1     | 5 × 1.0 × 0.7   | 3.5           |
+| **Total**     |              |       |                 | **81.7 → 82** |
 
 </details>
 
@@ -173,16 +175,16 @@ flowchart TD
 
 ## Built for flaky free services
 
-| Problem | What Vicinity does |
-|---|---|
-| Nominatim allows 1 request per second | A lock and timer in `geocoding.py`; every answer is saved in `GeocodeResult`, so the same search never asks twice |
-| The main Overpass server is often busy (HTTP 429/504) | Tries 3 servers in order, twice, and gives up after **60 s** so nobody waits forever |
-| Every map server is down, but the area was scored before | Shows the older score instead of an error |
-| The walking router is down | Estimates (straight line × 1.3 at 80 m/min) and marks the time with `~` |
-| The same area is searched again | Areas are keyed by location rounded to ~110 m and cached for 30 days: **0.001 s** |
-| A live demo must never wait for the map servers | 10 demo areas ship pre-scored in `areas/fixtures/demo_areas.json` and load on the first deploy |
-| The scoring endpoint could be abused | DRF throttling: 20 scores and 600 suggestions per hour per visitor |
-| Map tiles said "Access blocked" | Django's default `Referrer-Policy: same-origin` sends no Referer, and OpenStreetMap's tile servers require one. Fixed with `SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"` |
+| Problem                                                  | What Vicinity does                                                                                                                                                                      |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nominatim allows 1 request per second                    | A lock and timer in `geocoding.py`; every answer is saved in `GeocodeResult`, so the same search never asks twice                                                                       |
+| The main Overpass server is often busy (HTTP 429/504)    | Tries 3 servers in order, twice, and gives up after **60 s** so nobody waits forever                                                                                                    |
+| Every map server is down, but the area was scored before | Shows the older score instead of an error                                                                                                                                               |
+| The walking router is down                               | Estimates (straight line × 1.3 at 80 m/min) and marks the time with `~`                                                                                                                 |
+| The same area is searched again                          | Areas are keyed by location rounded to ~110 m and cached for 30 days: **0.001 s**                                                                                                       |
+| A live demo must never wait for the map servers          | 10 demo areas ship pre-scored in `areas/fixtures/demo_areas.json` and load on the first deploy                                                                                          |
+| The scoring endpoint could be abused                     | DRF throttling: 20 scores and 600 suggestions per hour per visitor                                                                                                                      |
+| Map tiles said "Access blocked"                          | Django's default `Referrer-Policy: same-origin` sends no Referer, and OpenStreetMap's tile servers require one. Fixed with `SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"` |
 
 ---
 
@@ -261,41 +263,52 @@ Constraints: `Area.grid_key` is unique · one `CategoryScore` per (area, categor
 
 ## REST API
 
-| Method | Endpoint | Returns |
-|---|---|---|
-| GET | `/api/score/?address=Bandra West, Mumbai` | Scores any address: full breakdown and places (20 per hour) |
-| GET | `/api/score/?lat=23.03&lon=72.56` | The same, for coordinates |
-| GET | `/api/suggest/?q=koramangla` | Typo-tolerant suggestions (`&local=1` = database only, instant) |
-| GET | `/api/areas/?search=ahmedabad` | Scored areas, best first, 20 per page |
-| GET | `/api/areas/<id>/` | One area with its categories and places |
-| GET | `/health/` | `{"status": "ok"}`, for the host's health checks (never touches the database) |
+| Method | Endpoint                                  | Returns                                                                       |
+| ------ | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| GET    | `/api/score/?address=Bandra West, Mumbai` | Scores any address: full breakdown and places (20 per hour)                   |
+| GET    | `/api/score/?lat=23.03&lon=72.56`         | The same, for coordinates                                                     |
+| GET    | `/api/suggest/?q=koramangla`              | Typo-tolerant suggestions (`&local=1` = database only, instant)               |
+| GET    | `/api/areas/?search=ahmedabad`            | Scored areas, best first, 20 per page                                         |
+| GET    | `/api/areas/<id>/`                        | One area with its categories and places                                       |
+| GET    | `/health/`                                | `{"status": "ok"}`, for the host's health checks (never touches the database) |
 
 Errors: `400` missing input · `404` unknown address · `503` map servers busy · `429` rate limited.
 
 ```bash
 curl "http://127.0.0.1:8000/api/suggest/?q=koramangla&local=1"
 ```
+
 ```json
-{"results": [{"label": "Koramangala, Bengaluru", "detail": "Scored 94/100 · Excellent",
-              "lat": 12.93, "lon": 77.62, "area_id": 5, "score": 94}]}
+{
+  "results": [
+    {
+      "label": "Koramangala, Bengaluru",
+      "detail": "Scored 94/100 · Excellent",
+      "lat": 12.93,
+      "lon": 77.62,
+      "area_id": 5,
+      "score": 94
+    }
+  ]
+}
 ```
 
 ---
 
 ## Tech stack
 
-| Layer | Tool | Why |
-|---|---|---|
-| Web framework | **Django 6.1** | Auth, ORM, admin, templates and security defaults, all built in |
-| API | **Django REST Framework 3.18** | Serializers, generic views, pagination and per-endpoint throttling |
-| Database | **PostgreSQL** (Neon) / SQLite (local) | `dj-database-url` reads one `DATABASE_URL`, so the same code runs on both |
-| Server | **gunicorn** + **WhiteNoise** | gunicorn runs Django in production; WhiteNoise serves compressed, cache-busted CSS/JS |
-| Map | **Leaflet 1.9** + OpenStreetMap tiles | Free, light, no API key |
-| Geocoding | **Nominatim** | Address → coordinates |
-| Places | **Overpass API** | "Every pharmacy within 1.2 km", all categories in one query |
-| Walking times | **OSRM** (foot router) | Real street routing; one "table" request for many walking times |
-| Suggestions | **Photon** | Built for search-as-you-type |
-| Design | **Geist + Geist Mono** | Apple-style greys, one green accent (`#14a800`), monospace `[01]` labels |
+| Layer         | Tool                                   | Why                                                                                   |
+| ------------- | -------------------------------------- | ------------------------------------------------------------------------------------- |
+| Web framework | **Django 6.1**                         | Auth, ORM, admin, templates and security defaults, all built in                       |
+| API           | **Django REST Framework 3.18**         | Serializers, generic views, pagination and per-endpoint throttling                    |
+| Database      | **PostgreSQL** (Neon) / SQLite (local) | `dj-database-url` reads one `DATABASE_URL`, so the same code runs on both             |
+| Server        | **gunicorn** + **WhiteNoise**          | gunicorn runs Django in production; WhiteNoise serves compressed, cache-busted CSS/JS |
+| Map           | **Leaflet 1.9** + OpenStreetMap tiles  | Free, light, no API key                                                               |
+| Geocoding     | **Nominatim**                          | Address → coordinates                                                                 |
+| Places        | **Overpass API**                       | "Every pharmacy within 1.2 km", all categories in one query                           |
+| Walking times | **OSRM** (foot router)                 | Real street routing; one "table" request for many walking times                       |
+| Suggestions   | **Photon**                             | Built for search-as-you-type                                                          |
+| Design        | **Geist + Geist Mono**                 | Apple-style greys, one green accent (`#14a800`), monospace `[01]` labels              |
 
 ---
 
@@ -343,9 +356,9 @@ Everything is set up in [`render.yaml`](render.yaml), so deploying is mostly cli
 1. **Neon** (neon.tech): create a project (region: Singapore) and copy the connection string.
 2. **Render**: New → **Blueprint** → this repo (or use the button at the top). Render reads `render.yaml` and asks for:
 
-   | Key | Value |
-   |---|---|
-   | `DATABASE_URL` | the Neon connection string |
+   | Key                                                  | Value                          |
+   | ---------------------------------------------------- | ------------------------------ |
+   | `DATABASE_URL`                                       | the Neon connection string     |
    | `DJANGO_SUPERUSER_USERNAME` / `_EMAIL` / `_PASSWORD` | your admin login for `/admin/` |
 
    `DJANGO_SECRET_KEY` is generated by Render, `DJANGO_DEBUG` is `False`, and the site's own address (`RENDER_EXTERNAL_HOSTNAME`) is allowed automatically.
@@ -387,12 +400,14 @@ render.yaml, build.sh   one-click Render deploy
 ## Known limits and next steps
 
 **Limits**
+
 - **OpenStreetMap is crowd-sourced.** The score reflects what's mapped: a street full of chemists scores 0 for pharmacies if nobody tagged them.
 - The 15-minute area is a 1.2 km straight-line circle; the walking times inside it are real.
 - The first score of a new area takes 5–30 s because the free servers are slow (repeats are instant).
 - Typo matching on scored areas uses Python's `difflib`: fine for thousands of areas, not millions.
 
 **Next steps**
+
 1. Background scoring with Celery + Redis, so a new search returns instantly and the page fills in.
 2. PostgreSQL's `pg_trgm` trigram index for fuzzy search inside the database.
 3. PostGIS for distance queries, and true walking isochrones instead of a circle.
