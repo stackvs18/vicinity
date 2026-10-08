@@ -4,7 +4,7 @@
 
 Built with **Django, Django REST Framework and PostgreSQL**, on free OpenStreetMap services.
 
-![Home](docs/home.png)
+![Home](docs/home_full.png)
 ![Area page](docs/area.png)
 ![Compare](docs/compare.png)
 

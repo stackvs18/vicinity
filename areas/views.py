@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -20,13 +21,19 @@ EXAMPLE_SEARCHES = [
 ]
 
 
-# Home page: the search box, the best areas and the latest searches
+# Home page: search, live numbers, the leaderboard, the categories and how it works
 def home(request):
+    # Total places mapped across every scored area
+    place_total = Area.objects.aggregate(total=Sum("place_count"))["total"] or 0
+
     context = {
         "examples": EXAMPLE_SEARCHES,
         "top_areas": Area.objects.order_by("-score")[:6],
         "recent_areas": Area.objects.order_by("-created_at")[:6],
+        "ticker_areas": Area.objects.order_by("-score")[:12],
         "area_count": Area.objects.count(),
+        "place_total": place_total,
+        "categories": CATEGORIES,
     }
     return render(request, "areas/home.html", context)
 

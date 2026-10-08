@@ -52,9 +52,30 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer">
-    <p>Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ·
-       places via Overpass · walking times via OSRM · built with Django &amp; PostgreSQL</p>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand">vicinity</span>
+        <p class="muted">How livable is your address? A 15-minute walk, scored out of 100.</p>
+      </div>
+      <div class="footer-column">
+        <span class="label">Product</span>
+        <a href="{% url 'home' %}">Search</a>
+        <a href="{% url 'compare' %}">Compare</a>
+        <a href="{% url 'api_area_list' %}">REST API</a>
+      </div>
+      <div class="footer-column">
+        <span class="label">Data</span>
+        <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
+        <span class="muted">Places via Overpass</span>
+        <span class="muted">Walking times via OSRM</span>
+      </div>
+      <div class="footer-column">
+        <span class="label">Built with</span>
+        <span class="muted">Django · DRF</span>
+        <span class="muted">PostgreSQL · Leaflet</span>
+      </div>
+    </div>
   </footer>
 
   <!-- Shown while a new address is being scored (it can take 10-30 seconds) -->

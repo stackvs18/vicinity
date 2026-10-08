@@ -1,12 +1,15 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block content %}
+<!-- Hero: one question, one search bar (Upwork-style), quiet dot grid behind it -->
 <section class="hero">
-  <span class="eyebrow fade-in">15-minute neighbourhood score</span>
+  <div class="hero-grid" aria-hidden="true"></div>
+  <span class="label fade-in">[ 15-minute neighbourhood score ]</span>
   <h1 class="fade-in delay-1">How livable is<br>your address?</h1>
   <p class="hero-sub fade-in delay-2">
-    Type any address. Vicinity finds every grocery, hospital, bus stop, park and pharmacy
-    within a 15-minute walk and scores it out of 100.
+    Every grocery, hospital, bus stop, park and pharmacy within a 15-minute walk.
+    Real walking times. One score out of 100.
   </p>
 
   <div class="search-box fade-in delay-3">
@@ -20,9 +23,9 @@
   </div>
 
   <div class="hero-actions fade-in delay-4">
-    <button type="button" class="link-button" id="use-location" data-url="{% url 'locate' %}">
-      📍 Use my location
-    </button>
+    <button type="button" class="link-button" id="use-location" data-url="{% url 'locate' %}">📍 Use my location</button>
+    <span class="dot-separator">·</span>
+    <span class="muted">typos are fine</span>
   </div>
 
   <div class="chips fade-in delay-4">
@@ -32,54 +35,114 @@
   </div>
 </section>
 
-{% if area_count %}
-<section class="two-columns">
-  <div class="card">
-    <h2 class="card-title">Top scored</h2>
-    <ul class="area-list">
-      {% for area in top_areas %}
-        <li>
-          <a href="{{ area.get_absolute_url }}">
-            <span class="area-list-name">{{ area.name }}</span>
-            <span class="pill pill-{{ area.grade|slugify }}">{{ area.grade }}</span>
-            <span class="area-list-score">{{ area.score }}</span>
-          </a>
-        </li>
+<!-- Live numbers -->
+<section class="stats fade-in delay-4">
+  <div class="stat"><span class="stat-number">{{ area_count }}</span><span class="label">areas scored</span></div>
+  <div class="stat"><span class="stat-number">{{ place_total|intcomma }}</span><span class="label">places mapped</span></div>
+  <div class="stat"><span class="stat-number">10</span><span class="label">categories</span></div>
+  <div class="stat"><span class="stat-number">1.2<small>km</small></span><span class="label">walking radius</span></div>
+</section>
+
+<!-- A slowly scrolling strip of scored areas -->
+{% if ticker_areas %}
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    {% for repeat in "ab" %}
+      {% for area in ticker_areas %}
+        <a class="ticker-item" href="{{ area.get_absolute_url }}"><span>{{ area.name }}</span><strong>{{ area.score }}</strong></a>
       {% endfor %}
-    </ul>
+    {% endfor %}
   </div>
-  <div class="card">
-    <h2 class="card-title">Recently checked</h2>
-    <ul class="area-list">
-      {% for area in recent_areas %}
-        <li>
-          <a href="{{ area.get_absolute_url }}">
-            <span class="area-list-name">{{ area.name }}</span>
-            <span class="muted small">{{ area.created_at|timesince }} ago</span>
-            <span class="area-list-score">{{ area.score }}</span>
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
+</div>
+{% endif %}
+
+<!-- Leaderboard, editorial style -->
+{% if area_count %}
+<section class="section">
+  <div class="section-head">
+    <span class="label">[01] Leaderboard</span>
+    <h2>The most walkable areas we've scored</h2>
+  </div>
+  <ol class="leaderboard">
+    {% for area in top_areas %}
+      <li>
+        <a href="{{ area.get_absolute_url }}">
+          <span class="rank">{{ forloop.counter|stringformat:"02d" }}</span>
+          <span class="leader-name">{{ area.name }}</span>
+          <span class="pill pill-{{ area.grade|slugify }}">{{ area.grade }}</span>
+          <span class="leader-places muted">{{ area.place_count|intcomma }} places</span>
+          <span class="leader-score">{{ area.score }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<!-- What we look for: a bento grid of the 10 categories (Apple-style tiles) -->
+<section class="section">
+  <div class="section-head">
+    <span class="label">[02] What counts</span>
+    <h2>Ten things you need within a walk</h2>
+  </div>
+  <div class="bento">
+    {% for category in categories %}
+      <div class="tile {% if category.weight == 15 %}tile-wide{% endif %}">
+        <span class="tile-icon">{{ category.icon }}</span>
+        <span class="tile-label">{{ category.label }}</span>
+        <span class="tile-weight"><strong>{{ category.weight }}</strong> pts</span>
+        <span class="tile-bar"><span style="width: {% widthratio category.weight 15 100 %}%; background: {{ category.color }}"></span></span>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section">
+  <div class="section-head">
+    <span class="label">[03] How it works</span>
+    <h2>Open map data, real streets, one honest number</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <span class="label">01 · Find</span>
+      <h3>Every place nearby</h3>
+      <p>Your address becomes coordinates (Nominatim). Every shop, clinic, stop and park within 1.2 km comes from OpenStreetMap (Overpass).</p>
+    </div>
+    <div class="step">
+      <span class="label">02 · Walk</span>
+      <h3>Real walking times</h3>
+      <p>One routing request (OSRM) measures the walk to the nearest place of each kind along real streets. Not straight lines.</p>
+    </div>
+    <div class="step">
+      <span class="label">03 · Score</span>
+      <h3>Out of 100</h3>
+      <p>Each category is worth points. Closer and more choice score higher. Every result is saved in PostgreSQL, so repeats are instant.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Recently checked -->
+{% if recent_areas %}
+<section class="section">
+  <div class="section-head">
+    <span class="label">[04] Recently checked</span>
+  </div>
+  <div class="recent-grid">
+    {% for area in recent_areas %}
+      <a class="recent-card" href="{{ area.get_absolute_url }}">
+        <span class="recent-score">{{ area.score }}</span>
+        <span class="recent-name">{{ area.name }}</span>
+        <span class="label">{{ area.created_at|timesince }} ago</span>
+      </a>
+    {% endfor %}
   </div>
 </section>
 {% endif %}
 
-<section class="steps">
-  <div class="step">
-    <span class="step-number">01</span>
-    <h3>Find</h3>
-    <p>Your address becomes coordinates (Nominatim), then every useful place within 1.2 km comes from OpenStreetMap (Overpass).</p>
-  </div>
-  <div class="step">
-    <span class="step-number">02</span>
-    <h3>Walk</h3>
-    <p>Real walking times along streets to the nearest of each kind, from the OSRM router. Not straight lines.</p>
-  </div>
-  <div class="step">
-    <span class="step-number">03</span>
-    <h3>Score</h3>
-    <p>10 categories, weighted to 100 points. Closer and more choice scores higher. Every area is cached in PostgreSQL.</p>
-  </div>
+<!-- Closing call to action -->
+<section class="cta">
+  <h2>Moving soon?<br>Check the walk first.</h2>
+  <a class="button-dark" href="#top" onclick="document.querySelector('.search input').focus(); return false;">Score an address</a>
 </section>
 {% endblock %}

@@ -64,6 +64,15 @@ class BuildAreaTests(TestCase):
         again = area_builder.build_area("A", "full", HOME_LAT, HOME_LON)
         self.assertEqual(again.pk, area.pk)
 
+    def test_typed_name_is_kept_when_the_address_contains_it(self):
+        name = area_builder.prefer_typed_name(
+            "Satellite, Ahmedabad", "Ramdev nagar, Ahmedabad",
+            "Satellite Road, Ramdev nagar, Vejalpur Taluka, Ahmedabad, Gujarat, India")
+        self.assertEqual(name, "Satellite, Ahmedabad")
+        # A typed name that isn't in the address is not trusted
+        self.assertEqual(area_builder.prefer_typed_name("Xyz", "Powai, Mumbai", "Powai, Mumbai"),
+                         "Powai, Mumbai")
+
     @mock.patch("areas.services.area_builder.overpass.fetch_places", side_effect=MapServiceBusy("down"))
     def test_new_area_with_servers_down_raises(self, fake_fetch):
         with self.assertRaises(MapServiceBusy):

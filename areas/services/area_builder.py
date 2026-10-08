@@ -172,6 +172,23 @@ def build_area(name, full_address, latitude, longitude, force_refresh=False):
     return area
 
 
+# Keeps the name the user typed when the map's own name is a smaller neighbourhood.
+# Example: typing "Satellite, Ahmedabad" lands in "Ramdev Nagar", but the full address still
+# contains "Satellite", so we show "Satellite, Ahmedabad".
+def prefer_typed_name(typed_text, map_name, full_address):
+    typed_place = typed_text.split(",")[0].strip()
+    if len(typed_place) < 3:
+        return map_name
+    typed_lower = typed_place.lower()
+    if typed_lower in map_name.lower():
+        return map_name  # the map's name already says it
+    if typed_lower not in full_address.lower():
+        return map_name  # the typed name isn't really there: trust the map
+
+    city = map_name.split(",")[-1].strip()
+    return typed_place.title() + ", " + city
+
+
 # Address text -> scored Area, in the fastest way that works:
 #   1. a strong match among areas we already scored (instant, typo-tolerant)
 #   2. Nominatim, for a properly written address
@@ -187,7 +204,8 @@ def score_address(address_text):
     # Step 2: Nominatim
     try:
         location = geocoding.geocode(address_text)
-        return build_area(location["name"], location["full_address"], location["lat"], location["lon"])
+        name = prefer_typed_name(address_text, location["name"], location["full_address"])
+        return build_area(name, location["full_address"], location["lat"], location["lon"])
     except AddressNotFound:
         pass
 
