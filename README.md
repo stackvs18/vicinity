@@ -4,9 +4,7 @@
 
 Built with **Django 6.1, Django REST Framework and PostgreSQL**, entirely on free OpenStreetMap services. No API keys.
 
-**Live demo:** https://vicinity.onrender.com (free plan: the first visit may take a minute to wake up)
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/stackvs18/vicinity)
+**Live demo:** (https://vicinity-4vyy.onrender.com/)
 
 ![Home](docs/home_full.png)
 
