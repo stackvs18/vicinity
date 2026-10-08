@@ -1,14 +1,17 @@
 # Tests for the pages and the REST API, with the map services faked.
 
+import io
+from datetime import timedelta
 from unittest import mock
 
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from areas.models import SavedArea
+from areas.models import Area, SavedArea
 from areas.services import area_builder
-from areas.services.errors import AddressNotFound
+from areas.services.errors import AddressNotFound, MapServiceBusy
 from areas.tests.test_area_builder import FAKE_PLACES, HOME_LAT, HOME_LON
 
 FAKE_LOCATION = {"name": "Navrangpura, Ahmedabad", "full_address": "Navrangpura, Ahmedabad, India",
@@ -104,3 +107,40 @@ class ApiTests(TestCase):
         self.assertEqual(listing["count"], 1)
         detail = self.client.get(reverse("api_area_detail", args=[area.pk])).json()
         self.assertEqual(len(detail["places"]), 2)
+
+
+class DeployTests(TestCase):
+
+    def test_health_check_answers_ok(self):
+        response = self.client.get(reverse("health"))
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    # A brand-new database (a first deploy) gets the 10 pre-scored demo areas from the
+    # fixture, even when the map servers can't be reached
+    @mock.patch("areas.management.commands.load_demo_areas.time.sleep")
+    @mock.patch("areas.management.commands.load_demo_areas.build_area",
+                side_effect=MapServiceBusy("offline"))
+    @mock.patch("areas.management.commands.load_demo_areas.score_address",
+                side_effect=MapServiceBusy("offline"))
+    def test_fresh_database_gets_the_demo_areas(self, fake_score_address, *fakes):
+        call_command("load_demo_areas", "--quiet", stdout=io.StringIO())
+        self.assertEqual(Area.objects.count(), 10)
+        fake_score_address.assert_not_called()  # no address lookups on a first deploy
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "Indiranagar")
+
+    # An old demo area is re-scored at its saved location, so no duplicate area appears
+    @mock.patch("areas.management.commands.load_demo_areas.time.sleep")
+    @mock.patch("areas.management.commands.load_demo_areas.build_area")
+    def test_old_demo_area_is_refreshed_in_place(self, fake_build_area, fake_sleep):
+        call_command("load_demo_areas", "--quiet", stdout=io.StringIO())
+        old_area = Area.objects.get(name="Satellite, Ahmedabad")
+        old_area.fetched_at = old_area.fetched_at - timedelta(days=60)
+        old_area.save()
+        fake_build_area.return_value = old_area
+
+        call_command("load_demo_areas", "--quiet", stdout=io.StringIO())
+
+        fake_build_area.assert_called_once_with(old_area.name, old_area.full_address,
+                                                old_area.lat, old_area.lon, force_refresh=True)
+        self.assertEqual(Area.objects.filter(name="Satellite, Ahmedabad").count(), 1)

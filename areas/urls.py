@@ -12,6 +12,7 @@ urlpatterns = [
     path("compare/", views.compare, name="compare"),
     path("saved/", views.saved_areas, name="saved_areas"),
     path("signup/", views.signup, name="signup"),
+    path("health/", views.health, name="health"),
 
     # REST API
     path("api/score/", api.ScoreView.as_view(), name="api_score"),

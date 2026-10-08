@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -230,3 +231,9 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
+
+
+# Render checks this address to see if the site is up. It doesn't touch the database,
+# so the checks never wake up (or use the free hours of) the Neon database.
+def health(request):
+    return JsonResponse({"status": "ok"})

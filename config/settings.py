@@ -3,8 +3,9 @@ Django settings for Vicinity.
 
 The same file works in two places:
   - On your laptop: no environment variables needed. Uses SQLite and DEBUG mode.
-  - On Render: set DATABASE_URL (PostgreSQL on Neon), DJANGO_SECRET_KEY, DJANGO_DEBUG=False,
-    ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS.
+  - On Render: set DATABASE_URL (PostgreSQL on Neon), DJANGO_SECRET_KEY and DJANGO_DEBUG=False.
+    Render's own address is allowed automatically (see RENDER_EXTERNAL_HOSTNAME below).
+    render.yaml sets all of this up (see "Deploy" in README.md).
 """
 
 import os
@@ -37,6 +38,13 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-m
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("true", "1", "yes")
 ALLOWED_HOSTS = read_list_from_env("ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com")
 CSRF_TRUSTED_ORIGINS = read_list_from_env("CSRF_TRUSTED_ORIGINS", "http://localhost:8000")
+
+# Render tells every app its own address (e.g. vicinity.onrender.com), so allow it automatically.
+# This saves typing it into ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS by hand.
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append("https://" + RENDER_EXTERNAL_HOSTNAME)
 
 # Render (and most hosts) handle HTTPS in front of Django and tell us with this header
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -102,6 +110,9 @@ DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///" + str(BASE_DIR / "db.sqlite3"),
         conn_max_age=600,
+        # Neon's free database sleeps after 5 idle minutes, which closes old connections.
+        # Check a connection before re-using it instead of failing the first request.
+        conn_health_checks=True,
     )
 }
 
