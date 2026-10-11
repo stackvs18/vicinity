@@ -1,0 +1,27 @@
+# Render Blueprint: dashboard.render.com → New → Blueprint → pick this repo.
+# Render reads this file and creates the website with these settings. It asks you for
+# the values marked "sync: false" (your Neon connection string and an admin login).
+
+services:
+  - type: web
+    name: vicinity
+    runtime: python
+    plan: free
+    region: singapore              # closest free region to India
+    buildCommand: ./build.sh
+    # 2 workers x 4 threads; scoring a brand-new address can take ~90 s on slow map servers
+    startCommand: gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    healthCheckPath: /health/
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true        # Render makes a long random key for you
+      - key: DATABASE_URL
+        sync: false                # paste the Neon connection string
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

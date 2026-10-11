@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Saved areas · Vicinity{% endblock %}
+
+{% block content %}
+<h1>Saved areas</h1>
+<div class="card">
+  {% if saved_list %}
+    <ul class="area-list">
+      {% for saved in saved_list %}
+        <li>
+          <a href="{{ saved.area.get_absolute_url }}">
+            <span class="area-list-name">{{ saved.area.name }}</span>
+            <span class="pill pill-{{ saved.area.grade|slugify }}">{{ saved.area.grade }}</span>
+            <span class="area-list-score">{{ saved.area.score }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Nothing saved yet. Open any area and press ☆ Save.</p>
+  {% endif %}
+</div>
+{% endblock %}

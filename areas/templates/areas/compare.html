@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Compare areas · Vicinity{% endblock %}
+
+{% block content %}
+<section class="compare-intro fade-in">
+  <h1>Compare two areas</h1>
+  <p class="muted">PG near college or flat near office? See which one wins, category by category.</p>
+
+  <form class="compare-form" action="{% url 'compare' %}" method="get" data-loading>
+    <div class="search-box">
+      <input type="text" name="a" value="{{ first_text }}" placeholder="First area" autocomplete="off" required
+             data-suggest="fill" data-suggest-url="{% url 'api_suggest' %}">
+      <ul class="suggestions" hidden></ul>
+    </div>
+    <span class="versus">vs</span>
+    <div class="search-box">
+      <input type="text" name="b" value="{{ second_text }}" placeholder="Second area" autocomplete="off" required
+             data-suggest="fill" data-suggest-url="{% url 'api_suggest' %}">
+      <ul class="suggestions" hidden></ul>
+    </div>
+    <button type="submit">Compare</button>
+  </form>
+</section>
+
+{% if rows %}
+<div class="card compare-card fade-in delay-1">
+  <div class="compare-head">
+    <span></span>
+    <a class="compare-area" href="{{ first_area.get_absolute_url }}">
+      <span class="compare-score {% if first_area.score >= second_area.score %}winner{% endif %}">{{ first_area.score }}</span>
+      <span>{{ first_area.name }}</span>
+    </a>
+    <a class="compare-area" href="{{ second_area.get_absolute_url }}">
+      <span class="compare-score {% if second_area.score >= first_area.score %}winner{% endif %}">{{ second_area.score }}</span>
+      <span>{{ second_area.name }}</span>
+    </a>
+  </div>
+
+  {% for row in rows %}
+    <div class="compare-row">
+      <span class="compare-label">{{ row.info.icon }} {{ row.info.label }}</span>
+      <div class="compare-cell {% if row.winner == 'first' %}winner{% endif %}">
+        <div class="row-bar"><span style="width: {{ row.first.percent }}%; background: {{ row.info.color }}"></span></div>
+        <span class="small">{{ row.first.points }}/{{ row.first.max_points }} · {{ row.first.place_count }} nearby</span>
+      </div>
+      <div class="compare-cell {% if row.winner == 'second' %}winner{% endif %}">
+        <div class="row-bar"><span style="width: {{ row.second.percent }}%; background: {{ row.info.color }}"></span></div>
+        <span class="small">{{ row.second.points }}/{{ row.second.max_points }} · {{ row.second.place_count }} nearby</span>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
