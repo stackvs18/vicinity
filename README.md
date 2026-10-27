@@ -4,7 +4,7 @@
 
 Built with **Django 6.1, Django REST Framework and PostgreSQL**, entirely on free OpenStreetMap services. No API keys.
 
-**Live demo:** ([https://vicinity-wxls.onrender.com/](https://vicinity-wxls.onrender.com))
+**Live demo:** [vicinity-wxls.onrender.com](https://vicinity-wxls.onrender.com) (free plan: the first visit may take about a minute to wake up)
 
 ![Home](docs/home_full.png)
 
